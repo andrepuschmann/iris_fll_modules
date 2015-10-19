@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+
+<softwareradio name="Radio1">
+
+    <!--<controller class="RadioConfig"/>-->
+
+    <controller class="genericdisplay">
+      <parameter name="scattercomponent" value="liquidofdmdemod1"/>
+      <parameter name="title" value="Constellation Plot"/>
+      <parameter name="xaxismin" value="-1.5"/>
+      <parameter name="xaxismax" value="1.5"/>
+      <parameter name="yaxismin" value="-1.5"/>
+      <parameter name="yaxismax" value="1.5"/>
+    </controller>
+
+    <engine name="phyengine1" class="phyengine">
+
+        <component name="filerawreader1" class="filerawreader">
+            <parameter name="filename" value="testdata.txt"/>
+            <parameter name="blocksize" value="1000"/>
+            <parameter name="datatype" value="uint8_t"/>
+            <parameter name="delay" value="500000"/>
+            <port name="output1" class="output"/>
+        </component>
+        
+        <component name="liquidofdmmod1" class="liquidofdmmod">
+            <parameter name="debug" value="true"/>
+            <parameter name="subcarriers" value="64"/>
+            <parameter name="prefixlength" value="16"/>
+            <parameter name="modulation" value="qam16"/>
+            <port name="input1" class="input"/>
+            <port name="output1" class="output"/>
+        </component>
+
+        <component name="liquidofdmdemod1" class="liquidofdmdemod">
+          <parameter name="debug" value="true"/>
+          <parameter name="hasscatterevent" value="true"/>
+          <parameter name="subcarriers" value="64"/>
+          <parameter name="prefixlength" value="16"/>
+          <port name="input1" class="input"/>
+          <port name="output1" class="output"/>
+        </component>
+
+        <component name="filerawwriter1" class="filerawwriter">
+            <parameter name="filename" value="out.bin"/>
+            <port name="input1" class="input"/>
+        </component>
+
+    </engine>
+
+    <link source="filerawreader1.output1" sink="liquidofdmmod1.input1" />
+    <link source="liquidofdmmod1.output1" sink="liquidofdmdemod1.input1" />
+    <link source="liquidofdmdemod1.output1" sink="filerawwriter1.input1" />
+
+</softwareradio>

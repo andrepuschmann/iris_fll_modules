@@ -2,6 +2,8 @@
 
 <softwareradio name="Radio1">
 
+  <controller class="radioconfig"/>
+
   <controller class="genericdisplay">
       <parameter name="scattercomponent" value="liquidofdmdemod1"/>
       <parameter name="title" value="Receiver Constellation Plot"/>
@@ -53,30 +55,22 @@
 
     <component name="liquidofdmmod1" class="liquidofdmmod">
       <parameter name="debug" value="false"/>
-      <parameter name="subcarriers" value="200"/>
-      <parameter name="prefixlength" value="8"/>
+      <parameter name="subcarriers" value="48"/>
+      <parameter name="prefixlength" value="6"/>
       <parameter name="modulation" value="qpsk"/>
+      <parameter name="gain" value="-12"/>
       <port name="input1" class="input"/>
       <port name="output1" class="output"/>
     </component>
-
-    <component name="signalscaler1" class="signalscaler">
-      <parameter name="factor" value="0.1"/>
-      <port name="input1" class="input"/>
-      <port name="output1" class="output"/>
-    </component>
-
-  </engine>
-  
-  <engine name="phyengine2" class="phyengine">
 
     <component name="usrptx1" class="usrptx">
-      <parameter name="frequency" value="5890000000"/>
+      <parameter name="frequency" value="5010000000"/>
       <parameter name="rate" value="5000000"/>
       <parameter name="fixlooffset" value="5000000"/>
       <parameter name="antenna" value="J1"/>
       <parameter name="gain" value="12"/>
       <parameter name="streaming" value="false"/>
+      <parameter name="numzerosamps" value="50"/>
       <port name="input1" class="input"/>
     </component>
 
@@ -86,7 +80,7 @@
   <engine name="phyengine3" class="phyengine">
 
     <component name="usrprx1" class="usrprx">
-      <parameter name="frequency" value="5890000000"/>
+      <parameter name="frequency" value="5010000000"/>
       <parameter name="rate" value="5000000"/>
       <parameter name="antenna" value="J1"/>
       <parameter name="gain" value="30"/>
@@ -98,8 +92,8 @@
     <component name="liquidofdmdemod1" class="liquidofdmdemod">
       <parameter name="debug" value="false"/>
       <parameter name="hasscatterevent" value="true"/>
-      <parameter name="subcarriers" value="200"/>
-      <parameter name="prefixlength" value="8"/>
+      <parameter name="subcarriers" value="48"/>
+      <parameter name="prefixlength" value="6"/>
       <port name="input1" class="input"/>
       <port name="output1" class="output"/>
     </component>
@@ -111,7 +105,6 @@
 
   <link source="tuntap0.bottomport1" sink="gdtp0.topport1" />
   <link source="gdtp0.bottomport1" sink="liquidofdmmod1.input1" />
-  <link source="liquidofdmmod1.output1" sink="signalscaler1.input1" />
-  <link source="signalscaler1.output1" sink="usrptx1.input1" />
+  <link source="liquidofdmmod1.output1" sink="usrptx1.input1" />
 
 </softwareradio>

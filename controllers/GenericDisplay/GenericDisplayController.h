@@ -38,6 +38,7 @@
 #include <boost/scoped_ptr.hpp>
 #include "graphics/qt/realplot/Realplot.h"
 #include "graphics/qt/scatterplot/Scatterplot.h"
+#include <boost/circular_buffer.hpp>
 
 namespace iris
 {
@@ -53,9 +54,11 @@ public:
     virtual void destroy();
 
 private:
-    std::string realEventCompName_x;
-    std::string scatterEventCompName_x;
+    std::string eventType_x;
+    std::string eventName_x;
+    std::string eventCompName_x;
     std::string title_x;
+    uint32_t windowWidth_x;
     bool xAxisAutoScale_x;
     bool yAxisAutoScale_x;
     double xAxisMin_x;
@@ -65,6 +68,7 @@ private:
 
     boost::scoped_ptr<Realplot> realPlot_;
     boost::scoped_ptr<Scatterplot> scatterPlot_;
+    boost::circular_buffer<float> realValues_;
 };
 
 } // namespace iris

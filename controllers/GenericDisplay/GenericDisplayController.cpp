@@ -32,6 +32,7 @@
  */
 
 #include <sstream>
+#include <algorithm>
 
 #include "irisapi/LibraryDefs.h"
 #include "irisapi/Version.h"
@@ -48,12 +49,16 @@ IRIS_CONTROLLER_EXPORTS(GenericDisplayController);
 GenericDisplayController::GenericDisplayController()
     : Controller("GenericDisplay", "A generic plotter", "Andre Puschmann", "0.1")
 {
-    registerParameter("spectrogramcomponent", "Name of realevent component",
-                      "", false, realEventCompName_x);
-    registerParameter("scattercomponent", "Name of scatter component",
-                      "", false, scatterEventCompName_x);
+    registerParameter("eventtype", "Type of the event (real, scatter)",
+                      "", false, eventType_x);
+    registerParameter("eventname", "Name of the actual event",
+                      "", false, eventName_x);
+    registerParameter("componentname", "Name of component that provides the data",
+                      "", false, eventCompName_x);
     registerParameter("title", "Title of the plot",
                       "Plot", false, title_x);
+    registerParameter("windowwidth", "Number of values to display",
+        "1", false, windowWidth_x);
     registerParameter("xaxisautoscale", "Whether X axis scales automatically",
                       "true", false, xAxisAutoScale_x);
     registerParameter("yaxisautoscale", "Whether Y axis scales automatically",
@@ -70,25 +75,26 @@ GenericDisplayController::GenericDisplayController()
 
 void GenericDisplayController::subscribeToEvents()
 {
-    subscribeToEvent("realevent", realEventCompName_x);
-    subscribeToEvent("scatterevent", scatterEventCompName_x);
+    subscribeToEvent(eventName_x, eventCompName_x);
 }
 
 void GenericDisplayController::initialize()
 {
-    if (!realEventCompName_x.empty() && !scatterEventCompName_x.empty())
-        throw IrisException("Each controller can only handle one event.");
+    const std::vector<std::string> eventTypes = { "real", "scatter" };
 
-    if (!realEventCompName_x.empty()) {
+    // check if event type is valid
+    if (std::find(eventTypes.begin(), eventTypes.end(), eventType_x) == eventTypes.end())
+        throw IrisException("Unknown event type.");
+
+    if (eventType_x == "real") {
         realPlot_.reset(new Realplot());
         realPlot_->setTitle(title_x);
         realPlot_->setXAxisAutoScale(xAxisAutoScale_x);
         realPlot_->setYAxisAutoScale(yAxisAutoScale_x);
         realPlot_->setXAxisScale(xAxisMin_x, xAxisMax_x);
         realPlot_->setYAxisScale(-100, 0);
-    }
-
-    if (!scatterEventCompName_x.empty()) {
+        realValues_.resize(windowWidth_x);
+    } else if (eventType_x == "scatter") {
         scatterPlot_.reset(new Scatterplot());
         scatterPlot_->setTitle(title_x);
         scatterPlot_->setXAxisAutoScale(xAxisAutoScale_x);
@@ -100,18 +106,21 @@ void GenericDisplayController::initialize()
 
 void GenericDisplayController::processEvent(Event &e)
 {
-    if (e.eventName == "realevent" && realPlot_) {
-        vector<float> data;
-        for(int i=0;i<e.data.size();i++)
-            data.push_back(boost::any_cast<float>(e.data[i]));
-        realPlot_->setNewData(data.begin(), data.end());
-    }
-
-    if (e.eventName == "scatterevent" && scatterPlot_) {
-        std::vector<std::complex<float> > data;
-        for(int i = 0; i < e.data.size(); i++)
-            data.push_back(boost::any_cast< std::complex<float> >(e.data[i]));
-        scatterPlot_->setNewData(&data[0], data.size());
+    // only handle registered event
+    if (e.eventName == eventName_x) {
+        if (realPlot_) {
+            assert(e.data.size() == 1);
+            for (int i = 0; i < e.data.size(); i++) {
+                realValues_.push_back(boost::any_cast<float>(e.data[i]));
+            }
+            realPlot_->setNewData(realValues_.begin(), realValues_.end());
+        } else if (scatterPlot_) {
+            std::vector<std::complex<float> > data;
+            for(int i = 0; i < e.data.size(); i++) {
+                data.push_back(boost::any_cast< std::complex<float> >(e.data[i]));
+            }
+            scatterPlot_->setNewData(&data[0], data.size());
+        }
     }
 }
 

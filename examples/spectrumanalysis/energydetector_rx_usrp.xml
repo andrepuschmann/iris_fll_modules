@@ -6,14 +6,18 @@
       <parameter name="eventtype" value="real"/>
       <parameter name="eventname" value="rssievent"/>
       <parameter name="componentname" value="energydetector1"/>
-      <parameter name="windowwidth" value="500"/>
+      <parameter name="windowwidth" value="250"/>
+      <parameter name="xaxisautoscale" value="true"/>
+      <parameter name="yaxisautoscale" value="false"/>
+      <parameter name="yaxismin" value="-100.0"/>
+      <parameter name="yaxismax" value="0.0"/>
       <parameter name="title" value="Received energy"/>
   </controller>
 
   <engine name="phyengine1" class="phyengine">
 
     <component name="usrprx1" class="usrprx">
-      <parameter name="frequency" value="5010000000"/>
+      <parameter name="frequency" value="2484000000"/>
       <parameter name="rate" value="2500000"/>
       <parameter name="antenna" value="J1"/>
       <parameter name="gain" value="5"/>

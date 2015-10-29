@@ -9,12 +9,12 @@
   <engine name="phyengine1" class="phyengine">
 
     <component name="usrprx1" class="usrprx">
-      <parameter name="frequency" value="5010000000"/>
+      <parameter name="frequency" value="2484000000"/>
       <parameter name="rate" value="2500000"/>
       <parameter name="antenna" value="J1"/>
       <parameter name="gain" value="5"/>
       <parameter name="fixlooffset" value="2500000"/>
-      <parameter name="outputblocksize" value="256"/>
+      <parameter name="outputblocksize" value="2048"/>
       <port name="output1" class="output"/>
     </component>
 

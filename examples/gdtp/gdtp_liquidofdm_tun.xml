@@ -5,7 +5,9 @@
   <controller class="radioconfig"/>
 
   <controller class="genericdisplay">
-      <parameter name="scattercomponent" value="liquidofdmdemod1"/>
+      <parameter name="eventtype" value="scatter"/>
+      <parameter name="eventname" value="scatterevent"/>
+      <parameter name="componentname" value="liquidofdmdemod1"/>
       <parameter name="title" value="Receiver Constellation Plot"/>
       <parameter name="xaxismin" value="-1.5"/>
       <parameter name="xaxismax" value="1.5"/>

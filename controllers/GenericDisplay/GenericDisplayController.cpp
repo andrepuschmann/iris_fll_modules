@@ -89,18 +89,29 @@ void GenericDisplayController::initialize()
     if (eventType_x == "real") {
         realPlot_.reset(new Realplot());
         realPlot_->setTitle(title_x);
-        realPlot_->setXAxisAutoScale(xAxisAutoScale_x);
-        realPlot_->setYAxisAutoScale(yAxisAutoScale_x);
-        realPlot_->setXAxisScale(xAxisMin_x, xAxisMax_x);
-        realPlot_->setYAxisScale(-100, 0);
+        if (xAxisAutoScale_x)
+            realPlot_->setXAxisAutoScale(xAxisAutoScale_x);
+        else
+            realPlot_->setXAxisScale(xAxisMin_x, xAxisMax_x);
+
+        if (yAxisAutoScale_x)
+            realPlot_->setYAxisAutoScale(yAxisAutoScale_x);
+        else
+            realPlot_->setYAxisScale(yAxisMin_x, yAxisMax_x);
+
         realValues_.resize(windowWidth_x);
     } else if (eventType_x == "scatter") {
         scatterPlot_.reset(new Scatterplot());
         scatterPlot_->setTitle(title_x);
-        scatterPlot_->setXAxisAutoScale(xAxisAutoScale_x);
-        scatterPlot_->setYAxisAutoScale(yAxisAutoScale_x);
-        scatterPlot_->setXAxisScale(xAxisMin_x, xAxisMax_x);
-        scatterPlot_->setYAxisScale(yAxisMin_x, yAxisMax_x);
+        if (xAxisAutoScale_x)
+            scatterPlot_->setXAxisAutoScale(xAxisAutoScale_x);
+        else
+            scatterPlot_->setXAxisScale(xAxisMin_x, xAxisMax_x);
+
+        if (yAxisAutoScale_x)
+            scatterPlot_->setYAxisAutoScale(yAxisAutoScale_x);
+        else
+            scatterPlot_->setYAxisScale(yAxisMin_x, yAxisMax_x);
     }
 }
 

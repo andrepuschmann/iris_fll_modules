@@ -28,6 +28,7 @@
 ########################################################################
 # Add an install dir for components
 ########################################################################
+SET(COMPONENTS_GPP_PHY_DIR ${COMPONENTS_GPP_DIR}/phy)
 SET(COMPONENTS_GPP_STACK_DIR ${COMPONENTS_GPP_DIR}/stack)
 
 ########################################################################
@@ -36,4 +37,5 @@ SET(COMPONENTS_GPP_STACK_DIR ${COMPONENTS_GPP_DIR}/stack)
 # Recurse into subdirectories. This does not actually cause another cmake
 # executable to run. The same process will walk through the project's
 # entire directory structure.
+ADD_SUBDIRECTORY(phy)
 ADD_SUBDIRECTORY(stack)

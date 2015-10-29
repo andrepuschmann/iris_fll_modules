@@ -180,6 +180,11 @@ MACRO(IRIS_SET_PIC)
 ENDMACRO(IRIS_SET_PIC)
 
 ########################################################################
+# Set compiler flags
+########################################################################
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
+
+########################################################################
 # Add the subdirectories
 ########################################################################
 # Recurse into the subdirectories. This does not actually

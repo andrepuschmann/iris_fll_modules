@@ -80,11 +80,11 @@ namespace iris
         if (x_debug) {
             LOG(LDEBUG) << "processEvent() called: " << e.eventName;
         }
-        if (e.eventName == "burstackev") {
+        if (e.eventName == "burstack") {
             Command packetInfo;
             packetInfo.typeId = e.typeId;
             packetInfo.trapWait = true;
-            packetInfo.commandName = "burstack";
+            packetInfo.commandName = e.eventName;
             packetInfo.componentName = x_componentMacModule;
             packetInfo.engineName = x_engineMacModule;
             postCommand(packetInfo);

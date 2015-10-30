@@ -12,12 +12,26 @@
       <parameter name="debug" value="false"/>
   </controller>
 
+<!--
+  <controller class="genericdisplay">
+      <parameter name="eventtype" value="real"/>
+      <parameter name="eventname" value="rssiresult"/>
+      <parameter name="componentname" value="energydetector1"/>
+      <parameter name="windowwidth" value="250"/>
+      <parameter name="xaxisautoscale" value="true"/>
+      <parameter name="yaxisautoscale" value="false"/>
+      <parameter name="yaxismin" value="-100.0"/>
+      <parameter name="yaxismax" value="0.0"/>
+      <parameter name="title" value="Received energy"/>
+  </controller>
+-->
+  
   <engine name="stackengine1" class="stackengine">
 
     <component name="filereader0" class="filereader">
         <parameter name="filename" value="testdata.bin"/>
         <parameter name="blocksize" value="1500"/>
-        <parameter name="delay" value="1000"/>
+        <parameter name="delay" value="250"/>
         <parameter name="sendbelow" value="true"/>
         <parameter name="packets" value="-1"/> <!-- -1 == never kill the thread -->
         <port name="topport1" class="io"/>
@@ -28,7 +42,6 @@
       <parameter name="localaddress" value="1"/>
       <parameter name="destinationaddress" value="2"/>
       <parameter name="isethdevice" value="false"/>
-      <parameter name="ethdevicename" value="tun0"/>
       <parameter name="isreliable" value="false"/>
       <parameter name="acktimeout" value="20"/>
       <parameter name="maxretry" value="3"/>
@@ -58,6 +71,7 @@
       <parameter name="debug" value="true"/>
       <parameter name="hascca" value="true"/>
       <parameter name="hasdcfbehavior" value="false"/>
+      <parameter name="hasburstack" value="false"/>
       <parameter name="mincw" value="31"/>
       <parameter name="maxcw" value="1023"/>
       <parameter name="slottime" value="1000"/>
@@ -65,15 +79,16 @@
       <port name="input1" class="input"/>
       <port name="output1" class="output"/>
     </component>
-    
+
     <component name="usrptx1" class="usrptx">
       <parameter name="frequency" value="5010000000"/>
       <parameter name="rate" value="2500000"/>
       <parameter name="fixlooffset" value="2500000"/>
       <parameter name="antenna" value="J1"/>
-      <parameter name="gain" value="5"/>
-      <parameter name="hasburstackevent" value="true"/>
+      <parameter name="gain" value="12"/>
       <parameter name="streaming" value="false"/>
+      <parameter name="numzerosamps" value="50"/>
+      <parameter name="hasburstackevent" value="false"/>
       <port name="input1" class="input"/>
     </component>
 
@@ -86,7 +101,7 @@
       <parameter name="frequency" value="5010000000"/>
       <parameter name="rate" value="2500000"/>
       <parameter name="antenna" value="J1"/>
-      <parameter name="gain" value="5"/>
+      <parameter name="gain" value="30"/>
       <parameter name="fixlooffset" value="2500000"/>
       <parameter name="outputblocksize" value="256"/>
       <port name="output1" class="output"/>

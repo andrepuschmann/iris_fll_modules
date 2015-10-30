@@ -77,8 +77,8 @@
     
     <component name="usrptx1" class="usrptx">
       <parameter name="frequency" value="5010000000"/>
-      <parameter name="rate" value="5000000"/>
-      <parameter name="fixlooffset" value="5000000"/>
+      <parameter name="rate" value="2500000"/>
+      <parameter name="fixlooffset" value="2500000"/>
       <parameter name="antenna" value="J1"/>
       <parameter name="gain" value="12"/>
       <parameter name="streaming" value="false"/>
@@ -94,10 +94,10 @@
 
     <component name="usrprx1" class="usrprx">
       <parameter name="frequency" value="5010000000"/>
-      <parameter name="rate" value="5000000"/>
+      <parameter name="rate" value="2500000"/>
       <parameter name="antenna" value="J1"/>
       <parameter name="gain" value="30"/>
-      <parameter name="fixlooffset" value="5000000"/>
+      <parameter name="fixlooffset" value="2500000"/>
       <parameter name="outputblocksize" value="256"/>
       <port name="output1" class="output"/>
     </component>

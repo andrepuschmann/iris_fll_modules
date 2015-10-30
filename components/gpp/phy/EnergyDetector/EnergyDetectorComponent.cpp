@@ -71,7 +71,7 @@ EnergyDetectorComponent::EnergyDetectorComponent(string name):
     registerParameter("issink", "Act as a sink (do not provide output)",
         "false", false, isSink_x);
 
-    registerEvent("rssievent", "An event providing the current received energy level in dBm",
+    registerEvent("rssiresult", "An event providing the current received energy level in dBm",
         TypeInfo< float >::identifier);
 }
 
@@ -221,7 +221,7 @@ void EnergyDetectorComponent::process()
         LOG(LDEBUG) << "RSSI: " << tmp;
     }
     if (isProbe_x) {
-        activateEvent("rssievent", tmp);
+        activateEvent("rssiresult", tmp);
     }
 
     if (not isSink_x) {

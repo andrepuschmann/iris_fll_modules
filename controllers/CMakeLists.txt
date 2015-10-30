@@ -57,6 +57,7 @@ INCLUDE_DIRECTORIES(${IRIS_MODULES_SOURCE_DIR}/lib/generic)
 # executable to run. The same process will walk through the project's 
 # entire directory structure.
 ADD_SUBDIRECTORY(GenericDisplay)
+ADD_SUBDIRECTORY(MacPhy)
 ADD_SUBDIRECTORY(RadioConfig)
 
 ########################################################################

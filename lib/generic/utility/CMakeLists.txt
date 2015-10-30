@@ -29,5 +29,6 @@
 # Custom target to ensure headers get picked up by IDEs
 ########################################################################
 SET(headers
+    RandomGenerator.h
 )
 ADD_CUSTOM_TARGET(libgenericutilityheaders_gpl SOURCES ${headers})

@@ -4,7 +4,7 @@
 
   <controller class="genericdisplay">
       <parameter name="eventtype" value="real"/>
-      <parameter name="eventname" value="rssievent"/>
+      <parameter name="eventname" value="rssiresult"/>
       <parameter name="componentname" value="energydetector1"/>
       <parameter name="windowwidth" value="250"/>
       <parameter name="xaxisautoscale" value="true"/>

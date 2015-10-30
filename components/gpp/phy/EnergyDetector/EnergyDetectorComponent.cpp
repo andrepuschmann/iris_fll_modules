@@ -134,10 +134,8 @@ void EnergyDetectorComponent::commandHandler()
             //LOG(LDEBUG) << "Waiting for command ..";
             Command command = waitForCommand("rssirequest");
             {
-                boost::unique_lock<boost::mutex> lock(mutex_);
-
                 // read CCA duration
-                assert(command.data.size() == 1);
+                assert(command.data.size() >= 1);
                 uint32_t ccaTime = boost::any_cast<uint32_t>(command.data[0]);
 
                 // calculate number of measurements to be performed
@@ -145,16 +143,28 @@ void EnergyDetectorComponent::commandHandler()
                 minNumSamples_ = std::max(samplesPerProcess_, minNumSamples_);
                 assert(minNumSamples_ > 0);
 
-                // reset
-                rssiVector_.clear();
-                ccaOver_ = false;
+                boost::unique_lock<boost::mutex> lock(mutex_);
+                if (ccaTime == 0) {
+                    // ccaTime zero means we will not return until channel is free
+                    assert(command.data.size() >= 2);
+                    float ccaThreshold = boost::any_cast<float>(command.data[1]);
 
-                // wait until CCA is done ..
-                while (not ccaOver_) {
-                    ccaOverCond_.wait(lock);
+                    // loop until RSSI is below CCA threshold
+                    do {
+                        rssiVector_.clear();
+                        ccaOver_ = false;
+                        while (not ccaOver_)
+                            ccaOverCond_.wait(lock);
+                    } while (rssiVector_[0] > ccaThreshold);
+                } else {
+                    // normal operation, we return no matter what the current channel state is
+                    rssiVector_.clear();
+                    ccaOver_ = false;
+                    while (not ccaOver_)
+                        ccaOverCond_.wait(lock);
                 }
 
-                // finally, trigger CCA result event
+                // finally, trigger RSSI result event
                 activateEvent("rssiresult", rssiVector_);
             }
         }
@@ -206,9 +216,11 @@ void EnergyDetectorComponent::process()
             boost::unique_lock<boost::mutex> lock(mutex_);
             // append rssi to result vector until necessary samples are present
             if (numSamples_ < minNumSamples_) {
-                numSamples_ += size;
                 rssiVector_.push_back(tmp);
-            } else {
+                numSamples_ += size;
+            }
+
+            if (numSamples_ >= minNumSamples_) {
                 // signal end of CCA
                 ccaOver_ = true;
                 numSamples_ = 0; // reset counter

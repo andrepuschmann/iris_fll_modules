@@ -48,7 +48,7 @@ IRIS_COMPONENT_EXPORTS(PhyComponent, SoftCsmaComponent);
 SoftCsmaComponent::SoftCsmaComponent(string name):
     PhyComponent(name, "softcsmaphycomponent", "A component implementing the carrier sense multiple access strategy.", "Andre Puschmann", "0.1")
     ,currentCw_(0)
-    ,dataFrameSent_(false)
+    ,waitForBurstAck_(false)
     ,backoffOver_(true)
 {
     //Format: registerParameter(name, description, default, dynamic?, parameter)
@@ -133,7 +133,7 @@ void SoftCsmaComponent::process()
     LOG(LDEBUG) << "Processing " << readDataSet->data.size() << " Bytes of data.";
 
     // wait for burst ACK event
-    if (hasBurstAck_x && dataFrameSent_) {
+    if (hasBurstAck_x && waitForBurstAck_) {
         Command command = waitForCommand("burstack");
     }
 
@@ -180,8 +180,8 @@ void SoftCsmaComponent::process()
         }
     }
 
-    dataFrameSent_ = isData; // save frame type
-    if (hasPostTxBackoff_x and dataFrameSent_) {
+    waitForBurstAck_ = isData; // save frame type
+    if (hasPostTxBackoff_x and waitForBurstAck_) {
         boost::unique_lock<boost::mutex> lock(mutex_);
         backoffOver_ = false;
         backoffOverCond_.notify_one();

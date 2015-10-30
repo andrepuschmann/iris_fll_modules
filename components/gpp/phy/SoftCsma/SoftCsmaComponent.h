@@ -68,7 +68,7 @@ private:
     uint32_t x_difs;            ///< DIFS in microseconds
 
     //Local variables
-    bool dataFrameSent_;        ///< True if previous frame was a data frame
+    bool waitForBurstAck_;        ///< True if previous frame was a data frame
     uint32_t currentCw_;        ///< Current backoff window in slottime
     boost::scoped_ptr<boost::thread> backoffThread_;
     boost::condition_variable backoffOverCond_;

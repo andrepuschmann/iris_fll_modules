@@ -147,6 +147,7 @@ namespace iris
         command.componentName = x_componentSensingModule;
         command.engineName = x_engineSensingModule;
         command.data.push_back(boost::any(duration));
+        if (duration == 0) command.data.push_back(boost::any(ccaThreshold_x));
         postCommand(command);
     }
 

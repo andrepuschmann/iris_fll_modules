@@ -62,6 +62,9 @@ SplitterComponent::SplitterComponent(string name):
     //Register all parameters
     registerParameter("numoutputs", "Number of outputs to split across",
             "2", false, numOutputs_x, Interval<uint32_t>(1, 10));
+
+    registerParameter("activeports", "Comma separated list of active ports",
+            "all", false, activePorts_x);
 }
 
 
@@ -91,6 +94,13 @@ void SplitterComponent::calculateOutputTypes(
 
 void SplitterComponent::initialize()
 {
+    updateActivePorts();
+}
+
+
+void SplitterComponent::parameterHasChanged(std::string name)
+{
+    updateActivePorts();
 }
 
 
@@ -160,17 +170,47 @@ void SplitterComponent::writeOutput()
     inBuf->getReadData(readDataSet);
     size_t size = readDataSet->data.size();
 
-    for (uint32_t i = 0; i < numOutputs_x; i++) {
-        WriteBuffer< T >* outBuf = castToType<T>(outputBuffers[i]);
+    // only send data on active ports
+    std::vector<int>::iterator it;
+    for (it = activePortsVector_.begin(); it != activePortsVector_.end(); ++it) {
+        WriteBuffer< T >* outBuf = castToType<T>(outputBuffers[*it]);
         outBuf->getWriteData(writeDataSet, size);
         for (uint32_t i=0; i < size; i++) {
             writeDataSet->data[i] = readDataSet->data[i];
         }
-        writeDataSet->metadata = readDataSet->metadata;
         outBuf->releaseWriteData(writeDataSet);
     }
 
     inBuf->releaseReadData(readDataSet);
+}
+
+
+void SplitterComponent::updateActivePorts()
+{
+    activePortsVector_.clear();
+    if (activePorts_x == "all") {
+        // enable all available ports
+        for (uint32_t i = 0; i < numOutputs_x; i++) {
+            activePortsVector_.push_back(i);
+        }
+    } else {
+        // enable ports given in variable, tokenize first
+        istringstream ss(activePorts_x);
+        while (ss) {
+            string s;
+            if (!getline(ss, s, ','))
+                break;
+            // try to extract port number from string
+            std::size_t pos = s.find_first_of("0123456789");
+            if (pos != std::string::npos) {
+                int id = boost::lexical_cast<int>(s[pos]);
+                id--; // internally, zero-based counting
+                if (id < numOutputs_x) {
+                    activePortsVector_.push_back(id);
+                }
+            }
+        }
+    }
 }
 
 } /* namespace phy */

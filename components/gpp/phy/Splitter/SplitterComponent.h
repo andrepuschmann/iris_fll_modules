@@ -36,6 +36,7 @@
 #define SPLITTERCOMPONENT_H_
 
 #include "irisapi/PhyComponent.h"
+#include <boost/lexical_cast.hpp>
 
 namespace iris
 {
@@ -47,6 +48,10 @@ class SplitterComponent: public PhyComponent
 private:
     //! The number of outputs required
     uint32_t numOutputs_x;
+    std::string activePorts_x;
+    std::vector<int> activePortsVector_;
+
+    void updateActivePorts(void);
 
     //! A template function used to write input data to the output
     template<typename T> void writeOutput();
@@ -59,6 +64,7 @@ public:
     virtual void registerPorts();
     virtual void initialize();
     virtual void process();
+    virtual void parameterHasChanged(std::string name);
 };
 
 } // namespace phy

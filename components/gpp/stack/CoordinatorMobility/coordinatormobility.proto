@@ -1,0 +1,49 @@
+// Copyright 2013 The Iris Project Developers. See the
+// COPYRIGHT file at the top-level directory of this distribution
+// and at http://www.softwareradiosystems.com/iris/copyright.html.
+//
+// This file is part of the Iris Project.
+//
+// Iris is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as
+// published by the Free Software Foundation, either version 3 of
+// the License, or (at your option) any later version.
+//
+// Iris is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// A copy of the GNU General Public License can be found in
+// the LICENSE file in the top-level directory of this distribution
+// and at http://www.gnu.org/licenses/.
+//
+
+message MobilityChannel {
+    enum Status {
+        FREE = 0;
+        BUSY_SU = 1;
+        BUSY_CU = 2;
+        BUSY_PU = 3;
+        UNKNOWN = 4;
+    }
+    optional uint64 f_center = 1;
+    optional uint32 bandwidth = 2;
+    optional Status status = 3 [default = UNKNOWN];
+}
+
+message MobilityPacket {
+    enum NodeType {
+        COORDINATOR = 0;
+        FOLLOWER = 1;
+    }
+    enum PacketType {
+        UPDATE_BC = 0;
+        UNKNOWN = 1;
+    }
+    required NodeType source = 1;
+    required NodeType destination = 2;
+    required PacketType type = 3 [default = UNKNOWN];
+    repeated MobilityChannel channelMap = 4;
+    repeated bytes payload = 5; // required even if actually not used
+}

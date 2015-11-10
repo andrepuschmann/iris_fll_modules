@@ -52,7 +52,7 @@ MetadataDetectorComponent::MetadataDetectorComponent(string name) :
     registerParameter("interval", "Interval for periodic detection in ms (-1 means no peridic detection)", "1000", false, interval_x);
 
     registerParameter("hasevent", "Whether to activate event after match", "true", false, hasEvent_x);
-    registerParameter("eventname", "The name of the event to trigger", "true", false, eventName_);
+    registerParameter("eventname", "The name of the event to trigger", "dummyevent", false, eventName_);
 
     registerParameter("manualsensing", "If changed, the component will trigger one sensing cycle", "1", false, manualDetection_);
     registerParameter("debug", "Enable debug output", "false", false, debug_x);
@@ -137,7 +137,12 @@ void MetadataDetectorComponent::process()
             bool patternFound = false;
             // extract string from metadata, if any
             std::string tmp;
-            in->metadata.getMetadata(key_x, tmp);
+            try {
+                in->metadata.getMetadata(key_x, tmp);
+            } catch (MetadataException& ex) {
+                LOG(LERROR) << "Metadata with key " << key_x << " not present in downstream data.";
+            }
+
             // match value
             if (not tmp.empty()) {
                 if (tmp.find(value_x) != std::string::npos) {

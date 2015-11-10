@@ -29,6 +29,7 @@
 # Custom target to ensure headers get picked up by IDEs
 ########################################################################
 SET(headers
+    FllStackComponent.h
     RandomGenerator.h
 )
 ADD_CUSTOM_TARGET(libgenericutilityheaders_gpl SOURCES ${headers})

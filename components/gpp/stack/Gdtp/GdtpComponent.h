@@ -78,6 +78,7 @@ private:
     int maxSeqNo_x;                     ///< Maximum sequence number
     bool isReliable_x;                  ///< Whether error control is enabled or not
     int statusInterval_x;               ///< Interval in ms between status updates
+    bool passthrough_x;                 ///< Whether to pass data through component
 
     // local variables
     std::unique_ptr<libgdtp::Gdtp> gdtp_;

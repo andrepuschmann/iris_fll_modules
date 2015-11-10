@@ -65,6 +65,7 @@ GdtpComponent::GdtpComponent(std::string name)
     registerParameter("maxretry", "Number of retransmissions", "100", false, maxRetry_x);
     registerParameter("maxseqno", "Maximum sequence number", "127", false, maxSeqNo_x);
     registerParameter("isreliable", "Whether error control is enabled or not", "true", false, isReliable_x);
+    registerParameter("passthrough", "Whether to pass data through component", "true", false, passthrough_x);
     registerParameter("statusinterval", "Interval in ms between status updates (0 for no updates)", "0", false, statusInterval_x);
 
     registerEvent("ferevent", "An event providing the current frame error rate [0:1]", TypeInfo< float >::identifier);
@@ -122,14 +123,18 @@ void GdtpComponent::processMessageFromAbove(boost::shared_ptr<StackDataSet> inco
     //StackHelper::printDataset(incomingFrame, "vanilla from above");
 
     // lookup libgdtp flow ID
+    FlowId id;
     try {
-        FlowId id = gdtpPorts_.at(incomingFrame->destPortName);
-        // convert incoming frame and pass it to libgdtp
-        std::shared_ptr<Data> sdu = std::make_shared<Data>(incomingFrame->data.begin(), incomingFrame->data.end());
-        gdtp_->handle_data_from_above(sdu, id);
+        id = gdtpPorts_.at(incomingFrame->destPortName);
     }
     catch (std::out_of_range& e) {
         LOG(LERROR) << e.what();
+    }
+
+    if (passthrough_x) {
+        // convert incoming frame and pass it to libgdtp
+        std::shared_ptr<Data> sdu = std::make_shared<Data>(incomingFrame->data.begin(), incomingFrame->data.end());
+        gdtp_->handle_data_from_above(sdu, id);
     }
 }
 

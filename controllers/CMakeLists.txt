@@ -56,6 +56,7 @@ INCLUDE_DIRECTORIES(${IRIS_MODULES_SOURCE_DIR}/lib/generic)
 # Recurse into subdirectories. This does not actually cause another cmake 
 # executable to run. The same process will walk through the project's 
 # entire directory structure.
+ADD_SUBDIRECTORY(FlexibleLinkLayer)
 ADD_SUBDIRECTORY(GenericDisplay)
 ADD_SUBDIRECTORY(MacPhy)
 ADD_SUBDIRECTORY(RadioConfig)

@@ -1,0 +1,208 @@
+<!--
+Copyright 2012-2014 The Iris Project Developers. See the
+COPYRIGHT file at the top-level directory of this distribution
+and at http://www.softwareradiosystems.com/iris/copyright.html.
+
+This file is part of the Iris Project.
+
+Iris is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of
+the License, or (at your option) any later version.
+
+Iris is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+A copy of the GNU General Public License can be found in
+the LICENSE file in the top-level directory of this distribution
+and at http://www.gnu.org/licenses/.
+-->
+
+<sm:StateMachine xmlns:sm="http://www.stateforge.com/StateMachineCpp-v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.stateforge.com/StateMachineCpp-v1                                      http://www.stateforge.com/xsd/StateMachineCpp-v1.xsd">
+    <!-- General settings -->
+    <settings asynchronous="true" library="boost">
+        <description>SpectrumMobility</description>
+        <object instance="fsm" class="SpectrumMobility" include="SpectrumMobility.h"/>
+        <include>FllChannel.h</include>
+    </settings>
+    <!-- events -->
+    <events>
+        <eventSource name="PuDetector">
+            <event id="EvPuActiveOperatingChannel"/>
+            <event id="EvPuActiveSensingChannel"/>
+        </eventSource>
+        <eventSource name="CoordinatorMobilityProtocol">
+            <event id="EvUpdateBackupChannel">
+              <parameter type="FllChannel" name="channel" passedBy="value"/>
+            </event>
+        </eventSource>
+
+        <eventSource name="SpectrumMobility">
+            <event id="EvChannelFound">
+              <parameter type="FllChannel" name="channel" passedBy="value"/>
+            </event>
+        </eventSource>
+
+        <eventSource name="FllController">
+            <event id="EvReconfDone0">
+              <parameter type="FllChannel" name="channel" passedBy="value"/>
+            </event>
+            <event id="EvReconfDone1">
+              <parameter type="FllChannel" name="channel" passedBy="value"/>
+            </event>
+            <event id="EvStart"/>
+            <event id="EvStop"/>
+        </eventSource>
+        <eventSource name="Timers">
+            <timer id="EvInactivityTimeout" name="InactivityTimer"/>
+            <timer id="EvSensingTimeout" name="SensingTimer"/>
+            <timer id="EvBcInvalidationTimeout" name="BcInvalidationTimer"/>
+        </eventSource>
+    </events>
+
+
+
+    <state name="SpectrumMobility">
+
+         <state name="Idle">
+         <parallel nextState="End">
+
+            <state name="SpectrumAccess">
+                <!-- transitions -->
+                <transition event="EvStop" nextState="End"/>
+                <!-- Children state -->
+                <state name="Running">
+                    <onEntry>
+                        <action>fsm.print("In RUNNING ..")</action>
+                        <action>fsm.setGdtpOperationMode(true)</action>
+                    </onEntry>
+                    <onExit>
+                        <action>fsm.print("Leaving RUNNING ..")</action>
+                        <action>fsm.setGdtpOperationMode(false)</action>
+                    </onExit>
+
+                    <transition event="EvUpdateBackupChannel" nextState="HasBackupChannel">
+                        <action>fsm.setBackupChannel(channel)</action>
+                    </transition>
+
+                    <state name="NoBackupChannel">
+                        <onEntry>
+                            <timerStart timer="BcInvalidationTimer" duration="fsm.getInvalidationTimeout()"/>
+                        </onEntry>
+                        <onExit>
+                            <timerStop timer="BcInvalidationTimer"/>
+                        </onExit>
+                        <transition event="EvPuActiveOperatingChannel" nextState="Waiting"/>
+                        <transition event="EvBcInvalidationTimeout" nextState="NoBackupChannel"/>
+                    </state>
+
+                    <state name="HasBackupChannel">
+
+                        <onEntry>
+                            <timerStart timer="BcInvalidationTimer" duration="fsm.getInvalidationTimeout()"/>
+                        </onEntry>
+                        <onExit>
+                            <timerStop timer="BcInvalidationTimer"/>
+                        </onExit>
+
+                        <transition event="EvBcInvalidationTimeout" nextState="NoBackupChannel"/>
+                        <transition event="EvPuActiveOperatingChannel" nextState="ReconfigureRadio0">
+                          <action>fsm.reconfigureChannel(fsm.getBackupChannel(), 0)</action> <!-- Reconfigure TRx 0 -->
+                          <action>fsm.incrementCounter()</action>
+                        </transition>
+                    </state>
+
+                </state>
+
+                <state name="Waiting">
+                    <onEntry>
+                        <action>fsm.print("In WAITING ..")</action>
+                        <timerStart timer="InactivityTimer" duration="fsm.getInactivityTimeout()"/>
+                    </onEntry>
+
+                    <transition event="EvPuActiveOperatingChannel" nextState="Waiting">
+                            <action>fsm.print("PU remains active in WAITING state.")</action>
+                    </transition>
+                    <transition event="EvInactivityTimeout" nextState="Running">
+                        <action>fsm.print("No PU activity detected within timeout!")</action>
+                    </transition>
+                </state>
+
+                <state name="ReconfigureRadio0">
+                    <transition event="EvReconfDone0" nextState="NoBackupChannel"/>
+                </state>
+
+            </state> <!-- State SpectrumAccess -->
+
+
+            <state name="SpectrumObserver">
+
+                <state name="ObserverRunning">
+
+                        <state name="FindNextChannel">
+                          <onEntry>
+                              <action>fsm.print("Picking new channel ..")</action>
+                              <action>fsm.getNextChannel()</action>
+                          </onEntry>
+
+                          <!-- Exit Oberserver if running in follower mode -->
+                          <transition event="EvChannelFound" nextState="SpectrumObserverEnd" condition="fsm.isFollower()">
+                            <action>fsm.print("Leaving SpectrumObserver region!")</action>
+                          </transition>
+
+                          <transition event="EvChannelFound" nextState="ReconfigureRadio1">
+                              <action>fsm.reconfigureChannel(channel, 1)</action> <!-- Reconfigure TRx 1 -->
+                          </transition>
+                        </state>
+
+                        <state name="ReconfigureRadio1">
+                            <transition event="EvReconfDone1" nextState="Sensing">
+                                <action>fsm.setSensingChannel(channel)</action>
+                            </transition>
+                        </state>
+
+                        <state name="Sensing">
+                            <onEntry>
+                                <action>fsm.setSensingMode(fsm.getSensingTrx(), true)</action>
+                                <timerStart timer="SensingTimer" duration="fsm.getSensingTimeout()"/>
+                            </onEntry>
+                            <onExit>
+                                <action>fsm.setSensingMode(fsm.getSensingTrx(), false)</action>
+                            </onExit>
+
+                            <transition event="EvPuActiveSensingChannel" nextState="PostSensing">
+                              <action>fsm.setSensingChannelState(BUSY_PU)</action>
+                            </transition>
+
+                            <transition event="EvPuActiveOperatingChannel" nextState="PostSensing"/>
+
+                            <transition event="EvSensingTimeout" nextState="FindNextChannel">
+                              <action>fsm.setSensingChannelState(FREE)</action>
+                              <timerStop timer="SensingTimer"/>
+                            </transition>
+                        </state>
+
+                        <!-- Dummy state primarily to stop sensing timer, could be integrated in main sensing state too -->
+                        <state name="PostSensing">
+                            <onExit>
+                                <timerStop timer="SensingTimer"/>
+                            </onExit>
+                            <transition event="EvSensingTimeout" nextState="FindNextChannel"/>
+                        </state>
+
+                        <state name="SpectrumObserverEnd" kind="final">
+                        </state>
+                </state> <!-- ObserverRunning -->
+
+            </state>   <!-- State SpectrumObserver -->
+
+        </parallel>
+        </state> <!-- State Idle -->
+
+        <state name="End" kind="final">
+        </state>
+    </state>
+
+</sm:StateMachine>

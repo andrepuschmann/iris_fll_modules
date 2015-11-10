@@ -1,0 +1,114 @@
+<!--
+Copyright 2012-2014 The Iris Project Developers. See the
+COPYRIGHT file at the top-level directory of this distribution
+and at http://www.softwareradiosystems.com/iris/copyright.html.
+
+This file is part of the Iris Project.
+
+Iris is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as
+published by the Free Software Foundation, either version 3 of
+the License, or (at your option) any later version.
+
+Iris is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+A copy of the GNU General Public License can be found in
+the LICENSE file in the top-level directory of this distribution
+and at http://www.gnu.org/licenses/.
+-->
+
+<sm:StateMachine xmlns:sm="http://www.stateforge.com/StateMachineCpp-v1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.stateforge.com/StateMachineCpp-v1                                      http://www.stateforge.com/xsd/StateMachineCpp-v1.xsd">
+    <!-- General settings -->
+    <settings asynchronous="true" library="boost">
+        <description>AgileReceiver</description>
+        <object instance="fsm" class="AgileReceiver" include="AgileReceiver.h"/>
+        <include>FllChannel.h</include>
+    </settings>
+    <!-- events -->
+    <events>
+        <eventSource name="FrameDetector">
+            <event id="EvFrameReceived"/>
+        </eventSource>
+        <eventSource name="AgileReceiver">
+            <event id="EvFrameTimeout"/>
+            <event id="EvChannelFound">
+              <parameter type="FllChannel" name="channel" passedBy="value"/>
+            </event>
+            <event id="EvChannelNotFound"/>
+        </eventSource>
+        <eventSource name="FllController">
+            <event id="EvReconfDone"/>
+            <event id="EvStart"/>
+            <event id="EvStop"/>
+        </eventSource>
+        <eventSource name="Timers">
+            <timer id="EvIdleTimer" name="EvIdleTimer"/>
+            <timer id="EvFrameTimer" name="EvFrameTimer"/>
+            <timer id="EvConnectionTimeout" name="EvConnectionTimeout"/>
+        </eventSource>
+    </events>
+    <!-- States -->
+    <state name="AgileReceiver">
+        <!-- transitions -->
+        <transition event="EvStop" nextState="End"/>
+        <!-- Children state -->
+        <state name="Unconnected">
+            <onEntry>
+                <action>fsm.Print("In Unconnected ..")</action>
+            </onEntry>
+            <transition event="EvStart" nextState="FindNextChannel"/>
+            <transition event="EvFrameReceived" nextState="Connected"/>
+            <state name="FindNextChannel">
+              <onEntry>
+              <action>fsm.Print("Picking new channel ..")</action>
+              <action>fsm.FindNextChannel()</action>
+              </onEntry>
+              <transition event="EvChannelFound" nextState="ReconfigureRadio">
+                <action>fsm.reconfigureChannel(channel)</action>
+              </transition>
+            </state>
+            <state name="ReconfigureRadio">
+            <onEntry>
+            </onEntry>
+                <transition event="EvReconfDone" nextState="WaitForFrame"/>
+            </state>
+            <state name="WaitForFrame">
+                <onEntry>
+                    <timerStart timer="EvFrameTimer" duration="fsm.getFrameTimeout()"/>
+                    <action>fsm.Print("Waiting for frame ..")</action>
+                </onEntry>
+                <transition event="EvFrameTimer" nextState="FindNextChannel" condition="fsm.getHasReceivedFrame() == false">
+                    <action>fsm.Print("No frame received within timeout!")</action>
+                </transition>
+            </state>
+        </state>
+
+        <state name="Connected">
+            <onEntry>
+                <timerStart timer="EvConnectionTimeout" duration="fsm.getFrameTimeout()"/>
+                <action>fsm.setHasReceivedFrame(false)</action>
+                <action>fsm.Print("Waiting for next incoming frame ..")</action>
+            </onEntry>
+            <onExit>
+                <action>fsm.Print("Leaving connected ..")</action>
+                <timerStop timer="EvFrameTimer"/>
+            </onExit>
+
+            <transition event="EvConnectionTimeout" nextState="Unconnected" condition="fsm.getHasReceivedFrame() == false">
+                <action>fsm.Print("No frame received within timeout, we're unconnected!")</action>
+            </transition>
+
+            <transition event="EvConnectionTimeout" nextState="Connected" condition="fsm.getHasReceivedFrame() == true"/>
+
+        </state>
+
+        <state name="End" kind="final">
+            <onEntry>
+                <action>fsm.Print("In End, exiting FSM ..")</action>
+            </onEntry>
+        </state>
+    </state>
+</sm:StateMachine>

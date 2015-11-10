@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+
+<softwareradio name="ofdm_usrp_tx">
+
+  <controller class="RadioConfig" />
+  
+    <controller class="fll">
+        <parameter name="fsmName" value="none"/>
+        <parameter name="dynamicParameter" value="rate=1000000,
+                                                  freq0=1616000000,
+                                                  freq1=1620000000,
+                                                  freq2=1624000000,
+                                                  "/>
+        <parameter name="channelmode" value="simple"/>
+        <parameter name="dryrun" value="false"/>
+        <parameter name="debug" value="true"/>
+    </controller>  
+
+  <engine name="phyengine1" class="phyengine">
+
+        <component name="filerawreader1" class="filerawreader">
+            <parameter name="filename" value="testdata.bin"/>
+            <parameter name="blocksize" value="1024"/>
+            <parameter name="datatype" value="uint8_t"/>
+            <parameter name="delay" value="0"/>
+            <port name="output1" class="output"/>
+        </component>
+        
+        <component name="liquidofdmmod1" class="liquidofdmmod">
+            <parameter name="debug" value="false"/>
+            <parameter name="subcarriers" value="64"/>
+            <parameter name="prefixlength" value="16"/>
+            <parameter name="modulation" value="qpsk"/>
+            <parameter name="frameheader" value="primary"/>
+            <port name="input1" class="input"/>
+            <port name="output1" class="output"/>
+        </component>
+
+        <component name="signalscaler1" class="signalscaler">
+          <parameter name="maximum" value="0.9"/>
+          <port name="input1" class="input"/>
+          <port name="output1" class="output"/>
+        </component>
+
+       <component name="usrptx1" class="usrptx">
+          <parameter name="args" value=""/>
+          <parameter name="frequency" value="1616000000"/>
+          <parameter name="rate" value="1000000"/>
+          <parameter name="antenna" value="TX/RX"/>
+          <parameter name="gain" value="35"/>
+          <parameter name="streaming" value="true"/>
+          <port name="input1" class="input"/>
+        </component>
+
+  </engine>
+
+  
+    <link source="filerawreader1.output1" sink="liquidofdmmod1.input1" />
+    <link source="liquidofdmmod1.output1" sink="signalscaler1.input1" />
+    <link source="signalscaler1.output1" sink="usrptx1.input1" />
+    
+</softwareradio>

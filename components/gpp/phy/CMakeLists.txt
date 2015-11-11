@@ -52,6 +52,7 @@ ENDMACRO(IRIS_APPEND_NOINSTALL_LIST)
 # executable to run. The same process will walk through the project's 
 # entire directory structure.
 ADD_SUBDIRECTORY(EnergyDetector)
+ADD_SUBDIRECTORY(SimpleTdmaTagger)
 ADD_SUBDIRECTORY(Splitter)
 ADD_SUBDIRECTORY(SoftCsma)
 

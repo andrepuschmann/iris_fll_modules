@@ -181,7 +181,7 @@ void SimpleTdmaTagger::process()
 
         // Attach transmit time tag to dataset
         uhd::time_spec_t nextTx = getNextTransmitTime();
-        writeDataSet->metadata.setMetadata("txtime", nextTx);
+        writeDataSet->metadata.setMetadata("timeStamp", nextTx.get_real_secs());
 
         releaseOutputDataSet("output1", writeDataSet);
     } else {

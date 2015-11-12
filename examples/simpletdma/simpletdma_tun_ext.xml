@@ -33,7 +33,7 @@
       <parameter name="rate" value="2500000"/>
       <parameter name="antenna" value="J1"/>
       <parameter name="gain" value="6"/>
-      <parameter name="ref" value="external"/>      
+      <parameter name="ref" value="mimo"/>
       <port name="output1" class="output"/>
     </component>
 
@@ -62,7 +62,7 @@
     <component name="simpletdmatagger1" class="simpletdmatagger">
       <parameter name="slotlength" value="8"/>
       <parameter name="numslots" value="3"/>
-      <parameter name="myslotnumber" value="1"/>
+      <parameter name="myslotnumber" value="0"/>
       <parameter name="guardlength" value="0"/>
       <parameter name="dsptimebuffer" value="0"/>
       <parameter name="worldclockoffset" value="0"/>
@@ -78,7 +78,8 @@
       <parameter name="antenna" value="J1"/>
       <parameter name="gain" value="8"/>
       <parameter name="streaming" value="false"/>
-      <parameter name="ref" value="external"/>
+      <parameter name="numzerosamps" value="50"/>
+      <parameter name="ref" value="mimo"/>
       <port name="input1" class="input"/>
     </component>
 

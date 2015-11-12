@@ -78,6 +78,7 @@
       <parameter name="antenna" value="J1"/>
       <parameter name="gain" value="8"/>
       <parameter name="streaming" value="false"/>
+      <parameter name="numzerosamps" value="50"/>
       <parameter name="ref" value="internal"/>
       <port name="input1" class="input"/>
     </component>

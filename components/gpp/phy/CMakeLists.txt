@@ -51,6 +51,8 @@ ENDMACRO(IRIS_APPEND_NOINSTALL_LIST)
 # Recurse into subdirectories. This does not actually cause another cmake 
 # executable to run. The same process will walk through the project's 
 # entire directory structure.
+ADD_SUBDIRECTORY(BladeRfRx)
+ADD_SUBDIRECTORY(BladeRfTx)
 ADD_SUBDIRECTORY(EnergyDetector)
 ADD_SUBDIRECTORY(SimpleTdmaTagger)
 ADD_SUBDIRECTORY(Splitter)

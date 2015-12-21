@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<softwareradio name="radio1">
+
+	<controller class="RadioConfig"/>
+
+    <controller class="fll">
+        <parameter name="fsmName" value="spectrummobility"/>
+        <parameter name="dynamicParameter" value="rate=1500000,
+                                                  freq0=868000000,
+                                                  freq1=870000000,
+                                                  freq2=872000000,
+                                                  numtrx=2,
+                                                  sensingtrx=1,
+                                                  reconfdelay0=0,
+                                                  reconfdelay1=800,
+                                                  puinactivitytimeout=2000,
+                                                  pusensingtimeout=1000,
+                                                  bcinvalidationtimeout=1500,
+                                                  posthandovertimeout=2000,
+                                                  enginegdtpmodule=stackengine1,
+                                                  componentgdtpmodule=gdtp0,
+                                                  channelclientmodule=coordinatormobility1,
+                                                  channelclientengine=stackengine1,
+                                                  componentsensingmodule0=metadatadetector0,
+                                                  enginesensingmodule1=phyengine4,
+                                                  componentsensingmodule1=metadatadetector1,
+                                                  enginerxmodule0=phyengine1,
+                                                  componentrxmodule0=usrprx1,
+                                                  enginetxmodule0=phyengine2,
+                                                  componenttxmodule0=usrptx1,
+                                                  enginerxmodule1=phyengine3,
+                                                  componentrxmodule1=rtlrx1,
+                                                  role=coordinator
+                                                  "/>
+        <parameter name="dryrun" value="false"/>
+        <parameter name="debug" value="true"/>
+    </controller>
+
+    <engine name="stackengine1" class="stackengine">
+
+        <component name="coordinatormobility1" class="coordinatormobility">
+            <parameter name="role" value="coordinator"/>
+            <parameter name="updateinterval" value="1000"/>
+            <port name="topport1" class="io"/>
+            <port name="bottomport1" class="io"/>
+        </component>
+
+        <component name="tuntap0" class="tuntap">
+          <parameter name="device" value="tun0"/>
+          <parameter name="readfrombelow" value="true"/>
+          <port name="bottomport1" class="io"/>
+        </component>
+
+        <component name="gdtp0" class="gdtpcomp">
+            <parameter name="numtopports" value="2"/>
+            <parameter name="localaddress" value="1"/>
+            <parameter name="destinationaddress" value="2"/>
+            <parameter name="isreliable" value="false"/>
+            <parameter name="acktimeout" value="100"/>
+            <parameter name="maxretry" value="5"/>
+            <port name="topport1" class="io"/>
+            <port name="topport2" class="io"/>
+            <port name="bottomport1" class="io"/>
+        </component>
+
+    </engine>
+    
+    
+    <engine name="phyengine1" class="phyengine">
+
+        <component name="usrprx1" class="usrprx">
+          <parameter name="frequency" value="868000000"/>
+          <parameter name="subdev" value="A:B"/>
+          <parameter name="rate" value="1500000"/>
+          <parameter name="fixlooffset" value="1500000"/>
+          <parameter name="antenna" value="RX2"/>
+          <parameter name="gain" value="80"/>
+          <port name="output1" class="output"/>
+        </component>
+        
+		<component name="liquidofdmdemod1" class="liquidofdmdemod">
+		  <parameter name="debug" value="false"/>
+		  <parameter name="hasscatterevent" value="false"/>
+		  <parameter name="subcarriers" value="48"/>
+		  <parameter name="prefixlength" value="6"/>
+		  <port name="input1" class="input"/>
+		  <port name="output1" class="output"/>
+		</component>
+
+        <component name="metadatadetector0" class="metadatadetector">
+            <parameter name="key" value="header"/>
+            <parameter name="value" value="primary"/>
+            <parameter name="interval" value="500"/>
+            <parameter name="hasevent" value="true"/>
+            <parameter name="eventname" value="EvPuActive0"/>
+            <parameter name="debug" value="true"/>
+            <port name="input1" class="input"/>
+            <port name="output1" class="output"/>
+        </component>
+    
+    </engine>    
+
+
+    <engine name="phyengine2" class="phyengine">
+
+		<component name="liquidofdmmod1" class="liquidofdmmod">
+		  <parameter name="debug" value="false"/>
+		  <parameter name="subcarriers" value="48"/>
+		  <parameter name="prefixlength" value="6"/>
+		  <parameter name="modulation" value="qpsk"/>
+		  <parameter name="gain" value="-12"/>
+		  <port name="input1" class="input"/>
+		  <port name="output1" class="output"/>
+		</component>
+
+		<component name="usrptx1" class="usrptx">
+		  <parameter name="frequency" value="868000000"/>
+		  <parameter name="rate" value="1500000"/>
+		  <parameter name="fixlooffset" value="1500000"/>
+		  <parameter name="antenna" value="TX/RX"/>
+		  <parameter name="gain" value="50"/>
+		  <parameter name="streaming" value="false"/>
+		  <parameter name="numzerosamps" value="50"/>
+		  <port name="input1" class="input"/>
+		</component>
+   
+    </engine>
+
+    <!-- Sensing PHY -->
+    <engine name="phyengine3" class="phyengine">
+
+        <component name="rtlrx1" class="rtlrx">
+          <parameter name="args" value=""/>
+          <parameter name="deviceindex" value="0"/>
+          <parameter name="rate" value="1500000"/>
+          <parameter name="frequency" value="868000000"/>
+          <parameter name="frequencycorrection" value="15"/>
+          <parameter name="gain" value="0"/>
+          <parameter name="outputblocksize" value="512"/>
+          <port name="output1" class="output"/>
+        </component>
+    
+    </engine>
+    
+    <engine name="phyengine4" class="phyengine">
+        
+        <component name="liquidofdmdemod2" class="liquidofdmdemod">
+            <parameter name="debug" value="true"/>
+            <parameter name="subcarriers" value="48"/>
+            <parameter name="prefixlength" value="6"/>
+            <port name="input1" class="input"/>
+            <port name="output1" class="output"/>
+        </component>
+
+        <component name="metadatadetector1" class="metadatadetector">
+            <parameter name="key" value="header"/>
+            <parameter name="value" value="primary"/>
+            <parameter name="interval" value="-1"/>
+            <parameter name="hasevent" value="true"/>
+            <parameter name="eventname" value="EvPuActive1"/>
+            <parameter name="debug" value="true"/>
+            <port name="input1" class="input"/>
+            <port name="output1" class="output"/>
+        </component>
+    
+        <component name="filerawwriter2" class="filerawwriter">
+            <parameter name="filename" value="/dev/null"/>
+            <port name="input1" class="input"/>
+        </component>
+    
+    </engine>
+
+
+    <!-- Stack layout -->
+    <link above="coordinatormobility1.bottomport1" below="gdtp0.topport1" />
+    <link above="tuntap0.bottomport1" below="gdtp0.topport2" />
+
+    <!-- PHY Rx layout -->
+    <link source="usrprx1.output1" sink="liquidofdmdemod1.input1" />
+    <link source="liquidofdmdemod1.output1" sink="metadatadetector0.input1" />
+    <link source="metadatadetector0.output1" sink="gdtp0.bottomport1" />
+
+    <!-- PHY Tx layout -->
+    <link source="gdtp0.bottomport1" sink="liquidofdmmod1.input1" />
+    <link source="liquidofdmmod1.output1" sink="usrptx1.input1" />
+    
+    <!-- Sensing PHY -->
+    <link source="rtlrx1.output1" sink="liquidofdmdemod2.input1" />
+    <link source="liquidofdmdemod2.output1" sink="metadatadetector1.input1" />
+    <link source="metadatadetector1.output1" sink="filerawwriter2.input1" /> 
+
+</softwareradio>

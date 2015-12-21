@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8" ?> 
 
-<softwareradio name="ofdm_usrp_tx">
+<softwareradio name="radio1">
 
-  <controller class="RadioConfig" />
+  <controller class="RadioConfig"/>
   
     <controller class="fll">
         <parameter name="fsmName" value="none"/>
         <parameter name="dynamicParameter" value="rate=1000000,
-                                                  freq0=1616000000,
-                                                  freq1=1620000000,
-                                                  freq2=1624000000,
+                                                  freq0=868000000,
+                                                  freq1=870000000,
+                                                  freq2=872000000,
+                                                  numtrx=1
                                                   "/>
         <parameter name="channelmode" value="simple"/>
         <parameter name="dryrun" value="false"/>
@@ -28,35 +29,29 @@
         
         <component name="liquidofdmmod1" class="liquidofdmmod">
             <parameter name="debug" value="false"/>
-            <parameter name="subcarriers" value="64"/>
-            <parameter name="prefixlength" value="16"/>
+            <parameter name="subcarriers" value="48"/>
+            <parameter name="prefixlength" value="6"/>
             <parameter name="modulation" value="qpsk"/>
             <parameter name="frameheader" value="primary"/>
+            <parameter name="gain" value="-12"/>
             <port name="input1" class="input"/>
             <port name="output1" class="output"/>
         </component>
 
-        <component name="signalscaler1" class="signalscaler">
-          <parameter name="maximum" value="0.9"/>
-          <port name="input1" class="input"/>
+        <component name="bladerftx1" class="bladerftx">
+          <parameter name="device" value="libusb: instance=0"/>
+          <parameter name="fpga" value="hostedx40.rbf"/>
+          <parameter name="frequency" value="870000000"/>
+          <parameter name="rate" value="1500000"/>
+          <parameter name="bw" value="1500000"/>
+          <parameter name="vga1gain" value="-8.0"/>
+          <parameter name="vga2gain" value="5.0"/>
           <port name="output1" class="output"/>
-        </component>
-
-       <component name="usrptx1" class="usrptx">
-          <parameter name="args" value=""/>
-          <parameter name="frequency" value="1616000000"/>
-          <parameter name="rate" value="1000000"/>
-          <parameter name="antenna" value="TX/RX"/>
-          <parameter name="gain" value="35"/>
-          <parameter name="streaming" value="true"/>
-          <port name="input1" class="input"/>
         </component>
 
   </engine>
 
-  
-    <link source="filerawreader1.output1" sink="liquidofdmmod1.input1" />
-    <link source="liquidofdmmod1.output1" sink="signalscaler1.input1" />
-    <link source="signalscaler1.output1" sink="usrptx1.input1" />
+  <link source="filerawreader1.output1" sink="liquidofdmmod1.input1" />
+  <link source="liquidofdmmod1.output1" sink="bladerftx1.input1" />
     
 </softwareradio>

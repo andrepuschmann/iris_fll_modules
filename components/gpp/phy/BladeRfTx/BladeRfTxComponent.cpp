@@ -315,6 +315,20 @@ void BladeRfTxComponent::parameterHasChanged(std::string name)
             throw IrisException("Failed to set sample rate!");
         }
         LOG(LINFO) << "Actual Tx sample rate is: " << actualValue << " Hz";
+    } else if(name == "vga1gain") {
+        if (bladerf_set_txvga1(device_, vga1Gain_x) != 0) {
+            throw IrisException("Failed to set VGA1 gain!");
+        }
+        int actualGain;
+        bladerf_get_txvga1(device_, &actualGain);
+        LOG(LINFO) << "Actual VGA1 gain is " << actualGain << " dB";
+    } else if(name == "vga2gain") {
+        if (bladerf_set_txvga2(device_, vga2Gain_x) != 0) {
+            throw IrisException("Failed to set VGA2 gain!");
+        }
+        int actualGain;
+        bladerf_get_txvga2(device_, &actualGain);
+        LOG(LINFO) << "Actual VGA2 gain is " << actualGain << " dB";
     }
   }
   catch(std::exception &e)

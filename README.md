@@ -24,20 +24,24 @@ managed by Software Radio Systems (http://www.softwareradiosystems.com).
 
 ## Getting Started
 
-The installation guide can be found here: http://www.softwareradiosystems.com/redmine/projects/iris/wiki/Installing_Iris
+The installation guide can be found [here](http://www.hostedredmine.com/projects/iris_software_radio)
 
 ## Requirements
 
 Required:
-* Iris_Core
+* Iris_Core (Use the **next** branch from my [iris_core](https://github.com/andrepuschmann/iris_core) repo )
 
 Optional:
 * Iris_Modules + Qwt for the graphical components
-* libgdtp
+* UHD for SimpleTdmaTagger
+* libgdtp for GdtpComponent (will be build through OSPECORR)
+* StateBuilderCpp for the fllcontroller
+   * Get and install it from [here](http://www.stateforge.com/Help/StateBuilderCpp/install-statebuildercpp-linux.aspx)
+
 
 ## Where To Get Help
 
-* Redmine: http://www.softwareradiosystems.com/redmine/projects/iris
+* Redmine: http://www.hostedredmine.com/projects/iris_software_radio
 * Iris-discuss mailing list: http://www.softwareradiosystems.com/mailman/listinfo/iris-discuss
 * Iris blog: http://irissoftwareradio.wordpress.com
 

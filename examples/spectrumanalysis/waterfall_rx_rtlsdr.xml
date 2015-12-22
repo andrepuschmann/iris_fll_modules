@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+
+<softwareradio name="Radio1">
+
+  <controller class="WaterfallDisplay">
+    <parameter name="spectrogramcomponent" value="spectrogram1"/>
+  </controller>
+
+  <engine name="phyengine1" class="phyengine">
+
+    <component name="rtlrx1" class="rtlrx">
+      <parameter name="args" value=""/>
+      <parameter name="deviceindex" value="0"/>
+      <parameter name="rate" value="1000000"/>
+      <parameter name="frequency" value="868000000"/>
+      <parameter name="frequencycorrection" value="19"/>
+      <parameter name="gain" value="0"/>
+      <parameter name="outputblocksize" value="512"/>
+      <port name="output1" class="output"/>
+    </component>
+    
+    <component name="spectrogram1" class="spectrogram">
+      <parameter name="nfft" value="512"/>
+      <parameter name="windowlength" value="256"/>
+      <parameter name="delay" value="128"/>
+      <parameter name="nwindows" value="16"/>
+      <parameter name="beta" value="8.6"/>
+      <parameter name="isprobe" value="true"/>
+      <parameter name="issink" value="true"/>
+      <parameter name="nfft" value="512"/>
+      <port name="input1" class="input"/>
+    </component>
+
+  </engine>
+
+  <link source="rtlrx1.output1" sink="spectrogram1.input1" />
+
+</softwareradio>

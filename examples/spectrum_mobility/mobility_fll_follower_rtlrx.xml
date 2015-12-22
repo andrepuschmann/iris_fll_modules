@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8" ?> 
+
+<softwareradio name="radio1">
+
+      <controller class="genericdisplay">
+          <parameter name="eventtype" value="scatter"/>
+          <parameter name="eventname" value="scatterevent"/>
+          <parameter name="componentname" value="liquidofdmdemod1"/>
+          <parameter name="title" value="Receiver Constellation Plot"/>
+          <parameter name="xaxisautoscale" value="false"/>
+          <parameter name="yaxisautoscale" value="false"/>
+          <parameter name="xaxismin" value="-1.5"/>
+          <parameter name="xaxismax" value="1.5"/>
+          <parameter name="yaxismin" value="-1.5"/>
+          <parameter name="yaxismax" value="1.5"/>
+      </controller>
+
+    <controller class="fll">
+        <parameter name="fsmName" value=""/>
+        <parameter name="dynamicParameter" value="rate=1500000,
+                                                  freq0=868000000,
+                                                  freq1=870000000,
+                                                  freq2=872000000,
+                                                  numtrx=1,
+                                                  reconfdelay0=0,
+                                                  puinactivitytimeout=5000,
+                                                  pusensingtimeout=1500,
+                                                  bcinvalidationtimeout=2000,
+                                                  posthandovertimeout=2000,
+                                                  enginerxmodule0=phyengine1,
+                                                  componentrxmodule0=rtlrx1,
+                                                  componentsensingmodule0=metadatadetector1,
+                                                  enginegdtpmodule=stackengine1,
+                                                  componentgdtpmodule=gdtp0,
+                                                  channelclientmodule=coordinatormobility1,
+                                                  channelclientengine=stackengine1,
+                                                  role=follower,
+                                                  "/>
+        <parameter name="dryrun" value="false"/>
+        <parameter name="debug" value="true"/>
+    </controller>
+
+    <engine name="stackengine1" class="stackengine">
+
+        <component name="coordinatormobility1" class="coordinatormobility">
+            <parameter name="role" value="follower"/>
+            <port name="topport1" class="io"/>
+            <port name="bottomport1" class="io"/>
+        </component>
+
+        <component name="tuntap0" class="tuntap">
+          <parameter name="device" value="tun0"/>
+          <parameter name="readfrombelow" value="true"/>
+          <port name="bottomport1" class="io"/>
+        </component>
+
+        <component name="gdtp0" class="gdtpcomp">
+          <parameter name="localaddress" value="2"/>
+          <parameter name="destinationaddress" value="1"/>
+          <parameter name="numtopports" value="2"/>
+          <parameter name="isethdevice" value="true"/>
+          <parameter name="ethdevicename" value="tun0"/>
+          <parameter name="isreliable" value="false"/>
+          <parameter name="acktimeout" value="20"/>
+          <parameter name="maxretry" value="3"/>
+          <port name="topport1" class="io"/>
+          <port name="bottomport1" class="io"/>
+        </component>
+
+    </engine>
+
+    <engine name="phyengine1" class="phyengine">
+
+        <component name="rtlrx1" class="rtlrx">
+          <parameter name="args" value=""/>
+          <parameter name="deviceindex" value="0"/>
+          <parameter name="rate" value="1500000"/>
+          <parameter name="frequency" value="868000000"/>
+          <parameter name="frequencycorrection" value="17"/>
+          <parameter name="gain" value="0"/>
+          <parameter name="outputblocksize" value="16384"/>
+          <port name="output1" class="output"/>
+        </component>
+
+        <component name="liquidofdmdemod1" class="liquidofdmdemod">
+          <parameter name="debug" value="true"/>
+          <parameter name="subcarriers" value="48"/>
+          <parameter name="prefixlength" value="6"/>
+          <parameter name="hasscatterevent" value="true"/>
+          <port name="input1" class="input"/>
+          <port name="output1" class="output"/>
+        </component>
+    
+        <component name="metadatadetector1" class="metadatadetector">
+            <parameter name="key" value="header"/>
+            <parameter name="value" value="primary"/>
+            <parameter name="interval" value="1000"/>
+            <parameter name="hasevent" value="true"/>
+            <parameter name="eventname" value="EvPuActive0"/>
+            <parameter name="debug" value="true"/>
+            <port name="input1" class="input"/>
+            <port name="output1" class="output"/>
+        </component> 
+
+    </engine>
+
+    <!-- Stack layout -->
+    <link above="coordinatormobility1.bottomport1" below="gdtp0.topport1" />
+    <link above="tuntap0.bottomport1" below="gdtp0.topport2" />
+    
+    <link source="rtlrx1.output1" sink="liquidofdmdemod1.input1" />
+    <link source="liquidofdmdemod1.output1" sink="metadatadetector1.input1" />   
+    <link source="metadatadetector1.output1" sink="gdtp0.bottomport1" />
+
+</softwareradio>

@@ -16,7 +16,7 @@
       </controller>
 
     <controller class="fll">
-        <parameter name="fsmName" value=""/>
+        <parameter name="fsmName" value="spectrummobility"/>
         <parameter name="dynamicParameter" value="rate=1500000,
                                                   freq0=868000000,
                                                   freq1=870000000,

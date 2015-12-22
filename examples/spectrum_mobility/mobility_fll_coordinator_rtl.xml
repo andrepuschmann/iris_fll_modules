@@ -2,7 +2,7 @@
 
 <softwareradio name="radio1">
 
-	<controller class="RadioConfig"/>
+    <controller class="RadioConfig"/>
 
     <controller class="fll">
         <parameter name="fsmName" value="spectrummobility"/>
